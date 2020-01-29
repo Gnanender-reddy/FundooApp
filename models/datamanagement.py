@@ -3,9 +3,9 @@
 @Since : Dec'2019
 @Description:This code is for managing database.
 """
-import base64
-from configuration.connection import Database
+from config.connection import database
 import re
+mydbobj=database
 
 
 class DataBaseMangament:
@@ -17,7 +17,7 @@ class DataBaseMangament:
         """
         This function is used to form a connection with database
         """
-        self.mydbobj = Database()
+        pass
 
 
     def registration(self, data):
@@ -25,18 +25,12 @@ class DataBaseMangament:
         This function is for inserting the data to database.
         """
         print(data)
-        query = "INSERT INTO users(email,password,confirmpassword) VALUES ('" + data['email'] + "','" + data['password'] + "','" + data['confirmpassword'] + "')"
-        self.mydbobj.execute(query)
+        query = "INSERT INTO users(email,password) VALUES ('" + data['email'] + "','" + data['password'] + "')"
+        mydbobj.execute(query)
 
 
-    def password_validation(self,data):
-        """
-         This function is used to checking whether password and confirm password are same.
-        """
-        if data['password'] == data['confirmpassword']:
-            return True
-        else:
-            return False
+
+
 
 
     def email_validation(self,email):
@@ -49,14 +43,27 @@ class DataBaseMangament:
         else:
             return False
 
+    def read_email(self, email=None):
+        id = None
+        sql = "SELECT email,id FROM users where email = '" + email + "'"
+        result = mydbobj.run_query(sql)
+        print(result)
+        print(email, id)
+        if result is not None:
+            email, id = result[0]
+            return id, email
+        else:
+            return None
+
     def checkinguser(self, email):
         """
         This function is used for whether provided email is in database or not.
         """
-        query = "select email from users where email = '" + email + "'"
-        result = self.mydbobj.run_query(query)
-        if result:
-            return True
+        query = "select * from users where email = '" + email + "'"
+        result = mydbobj.run_query(query)
+        id=result[0][0]
+        if id:
+            return id
         else:
             return False
 
@@ -66,7 +73,7 @@ class DataBaseMangament:
         This is  used for whether password is present or not.
         """
         query="select password from users where password='" + password+ "'"
-        result=self.mydbobj.run_query(query)
+        result=mydbobj.run_query(query)
         if result:
 
             return True
@@ -78,18 +85,18 @@ class DataBaseMangament:
         This function is used to update a password in database using sql query
         """
         query = " UPDATE users SET password = '" + password + "',confirmpassword='" + confirmpassword+ "' WHERE  email = '" + email + "' "
-        return self.mydbobj.execute(query)
+        return mydbobj.execute(query)
 
     def create_entry(self, data):
         """
         This function is used for inserting data in to data base.
         """
-        query = "INSERT INTO notes(title, description, color, ispinned, isarchive, istrash) VALUES ('" + \
+        query = "INSERT INTO notes(title, description, color, ispinned, isarchived, istrashed,user_id) VALUES ('" + \
                 data[
                     'title'] + "', '" + data['description'] + "', '" + data['color'] + "', '" + data[
                     'ispinned'] + "', '" + data[
-                    'isarchive'] + "', '" + data['istrash'] + "')"
-        return self.mydbobj.execute(query)
+                    'isarchived'] + "', '" + data['istrashed'] + "','" + data['user_id'] + "')"
+        return mydbobj.execute(query)
         # print("Entry create Successfully")
 
 
@@ -99,26 +106,26 @@ class DataBaseMangament:
         """
         query = "UPDATE notes SET title = '" + data['title'] + "',description = '" + data[
             'description'] + "',color = '" + data['color'] + "',ispinned = '" + data[
-                    'ispinned'] + "', isarchive = '" + data['isarchive'] + "', istrash = '" + data[
-                    'istrash'] + "' WHERE  id = " + data['id'] + ""
-        self.mydbobj.execute(query)
+                    'ispinned'] + "', isarchived = '" + data['isarchived'] + "', istrashed = '" + data[
+                    'istrashed'] + "' WHERE  user_id = " + data['user_id'] + ""
+        mydbobj.execute(query)
         print("Data update Successfully")
 
 
-    def delet(self,data):
+    def delete(self,data):
         """
         This function is used for deleting the data in the database based on id.
         """
-        query="delete from notes WHERE  id = " + data['id'] + ""
-        self.mydbobj.execute(query)
+        query="delete from notes WHERE  user_id = " + data['user_id'] + ""
+        mydbobj.execute(query)
 
 
     def read(self, data):
         """
         This function is used for reading the data from database
         """
-        query = "SELECT * FROM notes WHERE id = '" + data['id'] + "'"
-        data= self.mydbobj.run_query(query)
+        query = "SELECT * FROM notes WHERE user_id = '" + data['id'] + "'"
+        data= mydbobj.run_query(query)
         # print(data)
         return data
 
@@ -128,7 +135,7 @@ class DataBaseMangament:
         This function is used for reading data in which isTrash data is '1'.
         """
         query = "SELECT * FROM notes WHERE " + data['istrash'] + "=1 "
-        result = self.mydbobj.run_query(query)
+        result = mydbobj.run_query(query)
         for x in result:
             print(x)
             return x
@@ -140,7 +147,7 @@ class DataBaseMangament:
         This function is used for reading data in which isPinned data is '1'.
         """
         query = "SELECT * FROM notes WHERE " + data['ispinned'] + "=1 "
-        result = self.mydbobj.run_query(query)
+        result = mydbobj.run_query(query)
         for x in result:
             print(x)
             return x
@@ -152,7 +159,7 @@ class DataBaseMangament:
          This function is used for reading data in which isArchive data is '1'.
          """
         query = "SELECT * FROM notes WHERE " + data['isarchive'] + "=1 "
-        result = self.mydbobj.run_query(query)
+        result = mydbobj.run_query(query)
         for x in result:
             print(x)
             return x
@@ -165,10 +172,9 @@ class DataBaseMangament:
         This function is used for checking profile if it is exist or not.
 
         """
-        image = base64.b64encode(data['profile'])
-        valid_image = image.decode("utf-8")
-        query = "SELECT * from ProfilePicture where image = '" + valid_image + "'"
-        result = self.mydbobj.run_query(query)
+
+        query = "SELECT * from profile where user_id = '" + data['user_id'] + "'"
+        result = mydbobj.run_query(query)
         print(result)
         if len(result):
                 return False
@@ -177,15 +183,33 @@ class DataBaseMangament:
 
 
 
-    def create_profile(self, data):
-        """
-        This function is used for creating profile picture and sending in to database.
-        """
-        image = base64.b64encode(data['profile'])
-        valid_image = image.decode("utf-8")
-        query = "INSERT INTO ProfilePicture(image) VALUES('" + valid_image + "')"
-        self.mydbobj.execute(query)
-        print("Entry create Successfully")
+    def create_pic(self, data):
+            query = "INSERT INTO profile(profile_path, user_id)VALUES('" + data['profile_path'] + "','" + data[
+            'user_id'] + "')"
+            mydbobj.execute(query)
+            return {'success': True, 'data': [], 'message': "Pic saved Successfully"}
+
+
+
+    def validate_file_extension(self, data):
+        import os
+        ext = os.path.splitext(data['profile_path'])[1]  # [0] returns path+filename
+        valid_extensions = ['.jpg']
+        if not ext.lower() in valid_extensions:
+            print("Unsupported file extension.")
+        else:
+            return True
+            # raise ValidationError(u'Unsupported file extension.')
+
+    def validate_file_size(self, data):
+        filesize = len(data['profile_path'])
+        if filesize > 10485760:
+            print("The maximum file size that can be uploaded is 10MB")
+        else:
+            return True
+
+
+
 
 
 

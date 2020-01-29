@@ -8,7 +8,7 @@ import socket
 
 from nltk import app, sys
 
-from view.credentials import details
+from view.userservice import details
 sys.path.append("../..")
 
 
