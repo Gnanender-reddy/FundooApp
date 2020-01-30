@@ -33,15 +33,7 @@ class DataBaseMangament:
 
 
 
-    def email_validation(self,email):
-        """
-        This function is used for checking whether entered email is in correct format or not.
-        """
-        regex='^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
-        if re.search(regex,email):
-            return True
-        else:
-            return False
+
 
     def read_email(self, email=None):
         id = None
@@ -64,6 +56,13 @@ class DataBaseMangament:
         id=result[0][0]
         if id:
             return id
+        else:
+            return False
+    def checking_email(self,email):
+        query="select * from users where email='"+email+"'"
+        result=mydbobj.run_query(query)
+        if result:
+            return True
         else:
             return False
 
@@ -189,24 +188,33 @@ class DataBaseMangament:
             mydbobj.execute(query)
             return {'success': True, 'data': [], 'message': "Pic saved Successfully"}
 
+    def user_insert(self, data, table_name=None):
+
+        table_name = table_name
+        column = []
+        rows_values = []
+        val = []
+
+        for key, value in data.items():
+            column.append(key)
+        rows_values.append("%s")
+        val.append(value)
+
+        column = ', '.join(column)
+        val_ = ', '.join(['%s'] * len(val))
+
+        print(column)
+        print(rows_values)
+        print(val)
+        query = '''INSERT INTO %s (%s) VALUES (%s)''' % (table_name, column, val_)
+        print(query)
+
+        mydbobj.query_execute(query=query, value=val)
 
 
-    def validate_file_extension(self, data):
-        import os
-        ext = os.path.splitext(data['profile_path'])[1]  # [0] returns path+filename
-        valid_extensions = ['.jpg']
-        if not ext.lower() in valid_extensions:
-            print("Unsupported file extension.")
-        else:
-            return True
-            # raise ValidationError(u'Unsupported file extension.')
 
-    def validate_file_size(self, data):
-        filesize = len(data['profile_path'])
-        if filesize > 10485760:
-            print("The maximum file size that can be uploaded is 10MB")
-        else:
-            return True
+
+
 
 
 

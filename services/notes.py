@@ -22,7 +22,6 @@ class Note:
             data_base_object.update(data)
             responce_data.update({'success': True, 'data': [], 'message': "Data Updated Successfully"})
             return responce_data
-
         else:
             responce_data.update({'success': False, 'data': [], 'message': "unsuccessfull"})
             return responce_data
@@ -31,11 +30,9 @@ class Note:
         data_base_object = DataBaseMangament()
         respon = {'success': True, 'data': [], 'message': ""}
         if id:
-
             data_base_object.delete(data)
             respon.update({'success': True, 'data': [], 'message': "Data deleted Successfully"})
             return respon
-
         else:
             respon.update({'success':False,'data':[],'message':'data deletion unsuccessfull'})
             return respon

@@ -18,6 +18,7 @@ class Database:
     """
     def __init__(self,**kwargs):
         self.connection=self.connect(**kwargs)
+        self.mycursor = self.connection.cursor()
 
     def connect(self,**kwargs):
         """
@@ -38,15 +39,15 @@ class Database:
         """
         This function is used for running the query and fetching data from database.
         """
-        self.mycursor = self.connection.cursor()
+
         self.mycursor.execute(query)
         return self.mycursor.fetchall()
 
-    def execute(self, query):
+    def execute(self, query,value=None):
         """
         This function is for executing query and commiting data to database.
         """
-        self.mycursor = self.connection.cursor()
+
         self.mycursor.execute(query)
         self.connection.commit()
 

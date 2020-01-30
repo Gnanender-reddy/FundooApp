@@ -5,7 +5,6 @@
 """
 import cgi
 import jwt
-from config.redis_connection import RedisService
 from services.users import user
 from vendor.smtp import smtp
 from models.datamanagement import DataBaseMangament
@@ -45,24 +44,6 @@ class UserDetails:
         response_data = u.login(data)
         return response_data
 
-
-
-
-
-        #         email = data['email']
-        #         id, email = data_base_object.read_email(email=email)
-        #         if id:
-        #             payload = {'id': id,'exp': datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)}
-        #             encoded_token = jwt.encode(payload, 'secret', 'HS256').decode('utf-8')
-        #             print(id, encoded_token)
-        #             redis_obj = RedisService()
-        #             redis_obj.set(id, encoded_token)
-        #             print(redis_obj.get(id),'------------->r.get')
-        #             res = response(success=True, message="Login Successfully", data=[{"token": encoded_token}])
-        #             Response(self).jsonResponse(status=200, data=res)
-        # else:
-        #     Response(self).jsonResponse(status=400, data=response(message="credentials are missing"))
-
     def forgot_password(self, version):
         """
         This function is used for forgot password process.
@@ -75,21 +56,6 @@ class UserDetails:
         host = self.headers['Host']
         data_base_object=DataBaseMangament()
         data={'email':form['email'].value}
-        respon={'success':None,'data':[],'message':""}
-        if data_base_object.checkinguser(data['email']):
-            email=data['email']
-            s = smtp()
-            encoded_jwt = jwt.encode({'email': email}, 'secret', algorithm='HS256').decode("UTF-8")
-            data = f"{version}://{host}/reset/?new={encoded_jwt}"
-
-            s.send_mail(email,data)
-
-            respon.update({'success': True, 'data': [], 'message': "Message sent Successfully"})
-            Response(self).jsonResponse(status=200, data=respon)
-        else:
-
-            respon.update({'success': False, 'data': [], 'message': "unsuccessfull"})
-            Response(self).jsonResponse(status=404, data=respon)
 
 
     def  set_password(self,email_id):
