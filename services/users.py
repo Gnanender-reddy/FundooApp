@@ -9,30 +9,26 @@ JWT_SECRET = 'secret'
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 100000000
 
-# def response(success=False, message='something went wrong', data=[]):
-#     response = {'success': success,
-#     "message": message,
-#     "data": data, }
-#     return response
-# res = response(message="Signature expired. Please log in again.")
-#                 Response(self).jsonResponse(status=404, data=res)
-class user:
+
+class User:
     def __init__(self):
         self.data_base_object = DataBaseMangament()
+        self.util=Utility()
 
     def register(self,data):
 
-        util = Utility()
+
         if self.data_base_object.checking_email(data['email']):
             res=response(message="entered email already registered")
             return res
         else:
-            if util.password_validation(data) and util.email_validation(data['email']):
-                self.data_base_object.registration(data)
+            if self.util.password_validation(data) and self.util.email_validation(data['email']):
+                data={'email':data['email'],'password':data['password']}
+                self.data_base_object.user_insert(data,table_name='users')
                 res = response(success=True,message="Successfully registered")
                 return res
             else:
-                res = response(success=False, message="Please enter your credentials in proper format")
+                res = response(message="Please enter your credentials in proper format")
                 return res
 
 
@@ -55,7 +51,7 @@ class user:
                 responce.update({'success': True, 'data': [], 'message': "Successfully login","token": encoded_token})
                 return responce
         else:
-            res = response(success=False, message="Login unsuccessfull")
+            res = response(message="Login unsuccessfull")
             return res
 
     def forgot(self,data,version,host):
@@ -64,13 +60,40 @@ class user:
             email = data['email']
             s = smtp()
             encoded_jwt = jwt.encode({'email': email}, 'secret', algorithm='HS256').decode("UTF-8")
-            data = f"{version}://{host}/reset/?new={encoded_jwt}"
+            data = f"{host}://{version}/reset/?new={encoded_jwt}"
             s.send_mail(email, data)
             res = response(success=True, message="Message sent successfully")
             return res
         else:
-            res = response(success=False, message="unsuccessfull")
+            res = response(message="unsuccessfull")
             return res
+
+    def resett(self,form_keys,data,email_id):
+
+        if len(form_keys) < 2:
+            res = response(message="some values are missing")
+            return res
+        else:
+
+            self.data_base_object.update_password(email_id,data['password'])
+            res = response(success=True, message="Password Reset successfull")
+            return res
+
+
+
+    def profile_picture(self,profile_data):
+
+        flag = self.util.validate_file_extension(profile_data)
+        check = self.util.validate_file_size(profile_data)
+        if flag and check:
+            self.data_base_object.create_pic(profile_data)
+            res = response(success=True, message="Profile Updated Successfully")
+            return res
+        else:
+            res = response(message="Unsupported file extension")
+            return res
+
+
 
 
 

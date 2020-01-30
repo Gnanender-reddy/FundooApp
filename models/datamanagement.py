@@ -19,20 +19,23 @@ class DataBaseMangament:
         """
         pass
 
-
-    def registration(self, data):
-        """
-        This function is for inserting the data to database.
-        """
-        print(data)
-        query = "INSERT INTO users(email,password) VALUES ('" + data['email'] + "','" + data['password'] + "')"
-        mydbobj.execute(query)
-
-
-
-
-
-
+    def user_insert(self, data, table_name=None):
+        table_name = table_name
+        column = []
+        rows_values = []
+        val = []
+        for key, value in data.items():
+            column.append(key)
+            rows_values.append("%s")
+            val.append(value)
+        column = ', '.join(column)
+        val_ = ', '.join(['%s'] * len(val))
+        print(column)
+        print(rows_values)
+        print(val)
+        query = '''INSERT INTO %s (%s) VALUES (%s)''' % (table_name, column, val_)
+        print(query)
+        mydbobj.execute(query=query, value=val)
 
 
     def read_email(self, email=None):
@@ -58,6 +61,7 @@ class DataBaseMangament:
             return id
         else:
             return False
+
     def checking_email(self,email):
         query="select * from users where email='"+email+"'"
         result=mydbobj.run_query(query)
@@ -79,24 +83,13 @@ class DataBaseMangament:
         else:
             return False
 
-    def update_password(self, email,password, confirmpassword):
+    def update_password(self, email_id,password):
         """
         This function is used to update a password in database using sql query
         """
-        query = " UPDATE users SET password = '" + password + "',confirmpassword='" + confirmpassword+ "' WHERE  email = '" + email + "' "
+        query = " UPDATE users SET password = '" + password + "' WHERE  email = '" + email_id + "' "
         return mydbobj.execute(query)
 
-    def create_entry(self, data):
-        """
-        This function is used for inserting data in to data base.
-        """
-        query = "INSERT INTO notes(title, description, color, ispinned, isarchived, istrashed,user_id) VALUES ('" + \
-                data[
-                    'title'] + "', '" + data['description'] + "', '" + data['color'] + "', '" + data[
-                    'ispinned'] + "', '" + data[
-                    'isarchived'] + "', '" + data['istrashed'] + "','" + data['user_id'] + "')"
-        return mydbobj.execute(query)
-        # print("Entry create Successfully")
 
 
     def update(self, data):
@@ -123,9 +116,8 @@ class DataBaseMangament:
         """
         This function is used for reading the data from database
         """
-        query = "SELECT * FROM notes WHERE user_id = '" + data['id'] + "'"
+        query = "SELECT * FROM notes WHERE user_id = '" + data['user_id'] + "'"
         data= mydbobj.run_query(query)
-        # print(data)
         return data
 
 
@@ -137,7 +129,7 @@ class DataBaseMangament:
         result = mydbobj.run_query(query)
         for x in result:
             print(x)
-            return x
+        return len(result)
 
 
 
@@ -149,7 +141,7 @@ class DataBaseMangament:
         result = mydbobj.run_query(query)
         for x in result:
             print(x)
-            return x
+        return len(result)
 
 
 
@@ -161,8 +153,8 @@ class DataBaseMangament:
         result = mydbobj.run_query(query)
         for x in result:
             print(x)
-            return x
-        # print("Entry read Successfully")
+        return len(result)
+
 
 
 
@@ -188,28 +180,44 @@ class DataBaseMangament:
             mydbobj.execute(query)
             return {'success': True, 'data': [], 'message': "Pic saved Successfully"}
 
-    def user_insert(self, data, table_name=None):
 
+
+    def user_insert(self, data, table_name=None):
         table_name = table_name
         column = []
         rows_values = []
         val = []
-
         for key, value in data.items():
             column.append(key)
-        rows_values.append("%s")
-        val.append(value)
-
+            rows_values.append("%s")
+            val.append(value)
         column = ', '.join(column)
         val_ = ', '.join(['%s'] * len(val))
-
         print(column)
         print(rows_values)
         print(val)
         query = '''INSERT INTO %s (%s) VALUES (%s)''' % (table_name, column, val_)
         print(query)
+        mydbobj.execute(query=query, value=val)
 
-        mydbobj.query_execute(query=query, value=val)
+    def updatee(self, data, table_name=None, condition=None):
+        column = []
+        rows_values = []
+        val = []
+        for key, value in data.items():
+            column.append(key)
+            rows_values.append("%s")
+            val.append(value)
+        column1 = []
+        rows_values1 = []
+        val1 = []
+        for key1, value1 in condition.items():
+            column1.append(key1)
+            rows_values1.append("%s")
+            val1.append(value1)
+        terms = ' , '.join(f'{key} = %s' for key in data)
+        query = 'UPDATE %s SET ' % table_name + terms + ' WHERE %s = %s' % (column1[0], val1[0])
+        mydbobj.execute(query=query, value=val)
 
 
 

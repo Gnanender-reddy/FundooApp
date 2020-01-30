@@ -26,12 +26,14 @@ class ServiceHandler(SimpleHTTPRequestHandler):
         content = f"<html><body><h1>{message}</h1></body></html>"
         return content.encode("utf8")
 
-
+    @is_authenticated
     def do_GET(self):
         """
         This do_get method is used to request data from server.
         """
         self._set_headers()
+        note_details=NoteDetails
+
         if self.path == '/register':
             with open("templates/registration.html") as file:
                 html_string_register = file.read()
@@ -55,9 +57,22 @@ class ServiceHandler(SimpleHTTPRequestHandler):
                 html_string_register = f.read()
                 output = html_string_register.format(result=token)
                 self.wfile.write(self._html(output))
-        elif self.path == '/note/api/read':
-            user_details = UserDetails
-            user_details.read_data(self)
+        if self.path == '/note/api/read':
+
+            responsee = note_details.read_data(self)
+            Response(self).jsonResponse(status=200, data=responsee)
+
+        if self.path == '/note/api/trash':
+            responsee=note_details.is_trash(self)
+            Response(self).jsonResponse(status=200, data=responsee)
+
+        if self.path == '/note/api/pinned':
+            responsee=note_details.is_pinned(self)
+            Response(self).jsonResponse(status=200, data=responsee)
+
+        if self.path == '/note/api/archive':
+            responsee=note_details.is_archive(self)
+            Response(self).jsonResponse(status=200, data=responsee)
 
     @is_authenticated
     def do_PUT(self):
@@ -99,7 +114,9 @@ class ServiceHandler(SimpleHTTPRequestHandler):
 
 
         if self.path == '/forgotpassword':
-            user_details.forgot_password(self, version)
+            response_data=user_details.forgot_password(self, version)
+            Response(self).jsonResponse(status=200, data=response_data)
+
 
         elif 'new' in self.path:
 
@@ -108,6 +125,8 @@ class ServiceHandler(SimpleHTTPRequestHandler):
             token = query_comp["new"][0]
             tokenn = jwt.decode(token, 'secret', algorithm='HS256')
             user_details.set_password(self, tokenn['email'])
+            response_data = user_details.set_password(self, version)
+            Response(self).jsonResponse(status=200, data=response_data)
 
         if self.path == '/note/api/createdata':
             responsee=note_details.create_data(self)
@@ -115,16 +134,11 @@ class ServiceHandler(SimpleHTTPRequestHandler):
 
 
         if self.path == '/note/api/profilepicture':
-            user_details.create_picture(self)
+            responsee=user_details.create_picture(self)
+            Response(self).jsonResponse(status=200, data=responsee)
 
-        if self.path == '/note/api/trash':
-            user_details.is_trash(self)
 
-        if self.path == '/note/api/pinned':
-            user_details.is_pinned(self)
 
-        if self.path == '/note/api/archive':
-            user_details.is_archive(self)
 
 
 

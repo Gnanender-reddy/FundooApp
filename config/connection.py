@@ -48,7 +48,7 @@ class Database:
         This function is for executing query and commiting data to database.
         """
 
-        self.mycursor.execute(query)
+        self.mycursor.execute(query,value)
         self.connection.commit()
 
 database= Database(host=os.getenv("HOST"),

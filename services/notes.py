@@ -1,40 +1,71 @@
 from models.datamanagement import DataBaseMangament
+from auth.login_authentication import response
 
 class Note:
+    def __init__(self):
+        self.data_base_object = DataBaseMangament()
 
     def createnote(self,data,form_keys):
-        responce_data = {'success': True, 'data': [], 'message': ""}
-        data_base_object = DataBaseMangament()
         if len(form_keys):
-            print(data['user_id'], "------------------>gnanen")
-            data_base_object.create_entry(data)
-            responce_data.update({'success': True, ' data': [], 'message': "Entry Created Successfully"})
-            return responce_data
-
+            self.data_base_object.user_insert(data,table_name='notes')
+            res = response(success=True, message="Entry Created Successfully")
+            return res
         else:
-            responce_data.update({'success': False, 'data': [], 'message': "unsuccessfull"})
-            return responce_data
+            res = response(message="unsuccessfull")
+            return res
 
     def update(self,data,form_keys):
-        responce_data = {'success': True, 'data': [], 'message': ""}
-        data_base_object = DataBaseMangament()
         if len(form_keys):
-            data_base_object.update(data)
-            responce_data.update({'success': True, 'data': [], 'message': "Data Updated Successfully"})
-            return responce_data
+            self.data_base_object.update(data)
+            res = response(success=True, message="Data Updated Successfully")
+            return res
         else:
-            responce_data.update({'success': False, 'data': [], 'message': "unsuccessfull"})
-            return responce_data
+            res = response(message="unsuccessfull")
+            return res
+
+    def readd(self,data):
+        if data:
+            self.data_base_object.read(data)
+            res = response(success=True, message="Data reading done")
+            return res
+        else:
+            res = response(message="unsuccessfull")
+            return res
 
     def delete(self,data):
-        data_base_object = DataBaseMangament()
-        respon = {'success': True, 'data': [], 'message': ""}
-        if id:
-            data_base_object.delete(data)
-            respon.update({'success': True, 'data': [], 'message': "Data deleted Successfully"})
-            return respon
+        if data:
+            self.data_base_object.delete(data)
+            res = response(success=True, message="Data deleted Successfully")
+            return res
+
         else:
-            respon.update({'success':False,'data':[],'message':'data deletion unsuccessfull'})
-            return respon
+            res = response( message="Data deletion unsuccessfull")
+            return res
+
+    def pin(self,data):
+        if self.data_base_object.read_pin(data):
+            res = response(success=True, message="Pinned data reading done")
+            return res
+        else:
+            res = response(success=True, message="Pinned data reading is unsuccessfull")
+            return res
+
+    def trash(self,data):
+        if self.data_base_object.read_trash(data):
+            res = response(success=True, message=" data reading done")
+            return res
+        else:
+            res = response(success=True, message="data reading is unsuccessfull")
+            return res
+
+    def archive(self,data):
+        if self.data_base_object.read_archive(data):
+            res = response(success=True, message="data reading done")
+            return res
+        else:
+            res = response(success=True, message=" data reading is unsuccessfull")
+            return res
+
+
 
 

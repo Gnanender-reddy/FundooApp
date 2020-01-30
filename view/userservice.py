@@ -5,18 +5,15 @@
 """
 import cgi
 import jwt
-from services.users import user
-from vendor.smtp import smtp
-from models.datamanagement import DataBaseMangament
-from view.response import Response
+from services.users import User
+
 import cgitb;
-#from datetime import datetime, timedelta
-from auth.login_authentication import response
-# JWT_SECRET = 'secret'
-# JWT_ALGORITHM = 'HS256'
-# JWT_EXP_DELTA_SECONDS = 100000000
+
 cgitb.enable()
 class UserDetails:
+
+
+
     def for_registration(self):
         form = cgi.FieldStorage(
         fp=self.rfile,
@@ -25,8 +22,8 @@ class UserDetails:
         )
 
         data={'email':form['email'].value,'password':form['password'].value,'confirmpassword':form['confirmpassword'].value}
-        u=user()
-        response_data = u.register(data)
+        user = User()
+        response_data = user.register(data)
         return response_data
 
     def for_login(self):
@@ -40,8 +37,8 @@ class UserDetails:
                      'CONTENT_TYPE': self.headers['Content-Type'],
                      })
         data={'email':form['email'].value,'password':form['password'].value}
-        u = user()
-        response_data = u.login(data)
+        user = User()
+        response_data = user.login(data)
         return response_data
 
     def forgot_password(self, version):
@@ -53,15 +50,18 @@ class UserDetails:
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST','CONTENT_TYPE':self.headers['Content-Type'],}
         )
+        version=version.split('/')[0]
         host = self.headers['Host']
-        data_base_object=DataBaseMangament()
+
         data={'email':form['email'].value}
+        response_data = self.user.forgot(data,host,version)
+        return response_data
+
+
 
 
     def  set_password(self,email_id):
-        """
-        processing user input submitted in Front end(HTML)
-        """
+
         print(self.headers)
 
         form = cgi.FieldStorage(
@@ -70,40 +70,15 @@ class UserDetails:
             environ={'REQUEST_METHOD': 'POST',
                      'CONTENT_TYPE': self.headers['Content-Type'],
                      })
-        responce_data = {'success': None, 'data': [], 'message': ""}
-        form_keys = list(form.keys())
-        data = {'password': form['password'].value,'confirmpassword':form['confirmpassword'].value}
-        data_base_object=DataBaseMangament()
-        if len(form_keys) < 2:
-            responce_data.update({'success': False, 'data': [], 'message': "some values are missing"})
-            Response(self).jsonResponse(status=404, data=responce_data)
-        else:
-            data_base_object.update_password(email_id,data['password'],data['confirmpassword'])
-            responce_data.update({'success': True, 'data': [], 'message': "Password Reset successfull"})
 
-            Response(self).jsonResponse(status=200, data=responce_data)
-
-    def read_data(self):
-        """
-        This function is used for reading the data from the database.
-        """
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD': 'POST',
-                     'CONTENT_TYPE': self.headers['Content-Type'],
-                     })
-        responce_data = {'success': True, 'data': [], 'message': ""}
         form_keys = list(form.keys())
-        data = {'id': form['id'].value}
-        data_base_object=DataBaseMangament()
-        if len(form_keys) == 1:
-            data_base_object.read(data)
-            responce_data.update({'success': True, 'data': [], 'message': "Data read Successfully"})
-            Response(self).jsonResponse(status=200, data=responce_data)
-        else:
-            responce_data.update({'success': False, 'data': [], 'message': "some values are missing"})
-            Response(self).jsonResponse(status=404, data=responce_data)
+        data = {'password': form['password'].value}
+        user=User()
+
+        response_data =user.resett(data,form_keys,email_id)
+        return response_data
+
+
 
     def create_picture(self):
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
@@ -124,72 +99,13 @@ class UserDetails:
                 'profile_path': f'./media/{filename}',
                 'user_id': user_id
                     }
-            response_data = {'success': True, 'data': [], 'message': ""}
-            data_base_object = DataBaseMangament()
-            flag = data_base_object.validate_file_extension(profile_data)
-            check = data_base_object.validate_file_size(profile_data)
-            if flag and check:
-                data_base_object.create_pic(profile_data)
-                response_data.update({'success': True, "data": [], "message": "Profile Updated Successfully"})
-                Response(self).jsonResponse(status=200, data=response_data)
-
-            else:
-                response_data .update({'success': True, "data": [], "message": "Unsupported file extension"})
-                Response(self).jsonResponse(status=200, data=response_data)
-
-
-    def is_trash(self):
-        """
-        This function is for reading data from the database according to Trash value.
-        """
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD': 'POST',
-                     'CONTENT_TYPE': self.headers['Content-Type'],
-                     })
-        data = {'istrash': form['istrash'].value}
-        responce_data = {'success': None, 'data': [], 'message': ""}
-        data_base_object=DataBaseMangament()
-        data_base_object.read_trash(data)
-        responce_data.update({'success': True, 'data': [], 'message': "Data Read Successfully"})
-        Response(self).jsonResponse(status=200, data=responce_data)
+            user=User()
+            response_data = user.profile_picture(profile_data)
+            return response_data
 
 
 
-    def is_pinned(self):
-        """
-        This function is for reading data from the database according to Pinned value.
-        """
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD': 'POST',
-                     'CONTENT_TYPE': self.headers['Content-Type'],
-                     })
-        responce_data = {'success': None, 'data': [], 'message': ""}
-        data_base_object=DataBaseMangament()
-        data = {'ispinned': form['ispinned'].value}
-
-        data_base_object.read_pin(data)
-        responce_data.update({'success': True, 'data': [], 'message': "Data Read Successfully"})
-        Response(self).jsonResponse(status=200, data=responce_data)
 
 
-    def is_archive(self):
-        """
-        This function is for reading data from the database according to Archive value.
-        """
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD': 'POST',
-                     'CONTENT_TYPE': self.headers['Content-Type'],
-                     })
-        responce_data = {'success': None,'data':[],'message': ""}
-        data_base_object=DataBaseMangament()
-        data = {'isarchive': form['isarchive'].value}
 
-        data_base_object.read_archive(data)
-        responce_data.update({'success': True,'data':[], 'message': "Data Read Successfully"})
-        Response(self).jsonResponse(status=200, data=responce_data)
+

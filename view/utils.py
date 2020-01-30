@@ -15,7 +15,7 @@ class Utility:
     def validate_file_extension(self, data):
             import os
             ext = os.path.splitext(data['profile_path'])[1]  # [0] returns path+filename
-            valid_extensions = ['.jpg']
+            valid_extensions = ['.jpeg']
             if not ext.lower() in valid_extensions:
                 print("Unsupported file extension.")
             else:
