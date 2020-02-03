@@ -1,3 +1,9 @@
+"""
+@Author : P.Gnanender Reddy
+@Since : Dec'2019
+@Keywords:jwt,redis.
+@Description:This class is for users services which is used for user registration,login, forget password,reset password.
+"""
 import jwt
 from config.redis_connection import RedisService
 from models.db_operations import Models
@@ -11,13 +17,17 @@ JWT_EXP_DELTA_SECONDS = 100000000
 
 
 class UserServices:
+    """
+    This class is used for providing services for users.
+    """
     def __init__(self):
         self.data_base_object = Models()
         self.util=Utility()
 
     def register(self,data):
-
-
+        """
+        This function is used for user registration.
+        """
         if self.data_base_object.checking_email(data['email']):
             res=response(message="entered email already registered")
             return res
@@ -36,6 +46,9 @@ class UserServices:
 
 
     def login(self,data):
+        """
+        This function is used for user login.
+        """
 
         email = data['email']
         responce = {'success': True, 'data': [], 'message': "", 'data': ''}
@@ -55,6 +68,9 @@ class UserServices:
             return res
 
     def forgot(self,data,version,host):
+        """
+        This function is used when a particular user forgets his password.
+        """
 
         if self.data_base_object.checkinguser(data['email']):
             email = data['email']
@@ -69,6 +85,9 @@ class UserServices:
             return res
 
     def reset_password(self,form_keys,data,email_id):
+        """
+        This function is used for changing the password of user.
+        """
 
         if len(form_keys) < 2:
             res = response(message="some values are missing")
@@ -82,6 +101,9 @@ class UserServices:
 
 
     def profile_picture(self,profile_data):
+        """
+        This function is used for uploading picture of particular user.
+        """
 
         flag = self.util.validate_file_extension(profile_data)
         check = self.util.validate_file_size(profile_data)

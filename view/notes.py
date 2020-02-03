@@ -1,12 +1,22 @@
+"""
+@Author : P.Gnanender Reddy
+@Since : Dec'2019
+@Description:This class is for fetching the notes data from users.
+"""
+
 import cgi
-
 import jwt
-
 from services.notes_services import NoteServices
 
 class NoteDetails:
+    """
+    This class is for fetching the notes data from users.
+    """
 
     def create_data(self):
+        """
+        This function is used for fetching notes from user.
+        """
         token = self.headers['token']
         payload = jwt.decode(token, 'secret', algorithms='HS256')
         id = str(payload['id'])
@@ -25,6 +35,9 @@ class NoteDetails:
         return response
 
     def update_data(self):
+        """
+        This function is used for updating notes of particular user.
+        """
 
         token = self.headers['token']
         payload = jwt.decode(token, 'secret', algorithms='HS256')
@@ -45,6 +58,9 @@ class NoteDetails:
         return response
 
     def delete_data(self):
+        """
+        This function is used for deleting the notes of user.
+        """
         token = self.headers['token']
         payload = jwt.decode(token, 'secret', algorithms='HS256')
         id = str(payload['id'])
@@ -55,7 +71,7 @@ class NoteDetails:
 
     def read_data(self):
         """
-        This function is used for reading the data from the database.
+        This function is used for reading notes of user.
         """
         token = self.headers['token']
         payload = jwt.decode(token, 'secret', algorithms='HS256')

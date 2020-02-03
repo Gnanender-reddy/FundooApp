@@ -1,3 +1,9 @@
+"""
+@Author : P.Gnanender Reddy
+@Since : Dec'2019
+@:keyword:jwt,redis.
+@Description: Here we created decorator function for login authentication.
+"""
 import jwt
 from view.response import Response
 from config.redis_connection import RedisService
@@ -10,6 +16,9 @@ def response(success=False, message='something went wrong', data=[]):
     return response
 
 def is_authenticated(method):
+    """
+    This is decorator function for authentication.
+    """
     def authenticate_user(self):
         try:
             print(self.path, type(self.path))

@@ -1,7 +1,7 @@
 """
 @Author : P.Gnanender Reddy
 @Since : Dec'2019
-@Keywords:Mysql connector, dotenv
+@Keywords:Mysql connector, dotenv,singleton.
 @Description:This class is for my sql Data Base connection.
 """
 import os
