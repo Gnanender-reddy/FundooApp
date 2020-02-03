@@ -1,7 +1,14 @@
+"""
+@Author : P.Gnanender Reddy
+@Since : Dec'2019
+@Keywords:jwt,redis.
+@Description:Routes is a Python re-implementation of the Rails routes system for mapping URL’s to Controllers/Actions
+and generating URL’s. Routes makes it easy to create pretty and concise URL’s that are RESTful with little effort.
+"""
+
+
 from http.server import SimpleHTTPRequestHandler
-
 import jwt
-
 from auth.login_authentication import is_authenticated
 from view.notes import NoteDetails
 from view.response import Response
