@@ -2,7 +2,7 @@ import cgi
 
 import jwt
 
-from services.notes import Note
+from services.notes_services import NoteServices
 
 class NoteDetails:
 
@@ -20,7 +20,7 @@ class NoteDetails:
         data = {'title': form['title'].value, 'description': form['description'].value, 'color': form['color'].value,
                 'ispinned': form['ispinned'].value, 'isarchived': form['isarchived'].value,
                 'istrashed': form['istrashed'].value, 'user_id': id}
-        note = Note()
+        note = NoteServices()
         response=note.createnote(data, form_keys)
         return response
 
@@ -36,12 +36,12 @@ class NoteDetails:
                      'CONTENT_TYPE': self.headers['Content-Type'],
                      })
         form_keys = list(form.keys())
-        # condition={'user_id':id}
-        data = {'user_id': id, 'title': form['title'].value, 'description': form['description'].value,
+        condition={'user_id': id,}
+        data = { 'title': form['title'].value, 'description': form['description'].value,
                 'color': form['color'].value, 'ispinned': form['ispinned'].value,
                 'isarchived': form['isarchived'].value, 'istrashed': form['istrashed'].value}
-        note = Note()
-        response=note.update(data,form_keys)
+        note = NoteServices()
+        response=note.update(data,condition,form_keys)
         return response
 
     def delete_data(self):
@@ -49,7 +49,7 @@ class NoteDetails:
         payload = jwt.decode(token, 'secret', algorithms='HS256')
         id = str(payload['id'])
         data = {'user_id': id}
-        note = Note()
+        note = NoteServices()
         response=note.delete(data)
         return response
 
@@ -61,7 +61,7 @@ class NoteDetails:
         payload = jwt.decode(token, 'secret', algorithms='HS256')
         id = str(payload['id'])
         data = {'user_id':id }
-        note = Note()
+        note = NoteServices()
         response = note.readd(data)
         return response
 
@@ -79,8 +79,8 @@ class NoteDetails:
                      })
 
         data = {'ispinned': form['ispinned'].value}
-        note = Note()
-        response = self.pin(data)
+        note = NoteServices()
+        response = note.pin(data)
         return response
 
 
@@ -96,7 +96,7 @@ class NoteDetails:
                      })
 
         data = {'isarchive': form['isarchive'].value}
-        note = Note()
+        note = NoteServices()
         response = note.archive(data)
         return response
 
@@ -113,7 +113,7 @@ class NoteDetails:
                      'CONTENT_TYPE': self.headers['Content-Type'],
                      })
         data = {'istrash': form['istrash'].value}
-        note = Note()
+        note = NoteServices()
         response = note.trash(data)
         return response
 

@@ -3,9 +3,9 @@ from http.server import SimpleHTTPRequestHandler
 import jwt
 
 from auth.login_authentication import is_authenticated
-from view.noteservices import NoteDetails
+from view.notes import NoteDetails
 from view.response import Response
-from view.userservice import UserDetails
+from view.users import UserDetails
 
 
 class ServiceHandler(SimpleHTTPRequestHandler):
@@ -134,7 +134,7 @@ class ServiceHandler(SimpleHTTPRequestHandler):
 
 
         if self.path == '/note/api/profilepicture':
-            responsee=user_details.create_picture(self)
+            responsee=user_details.for_profile(self)
             Response(self).jsonResponse(status=200, data=responsee)
 
 

@@ -1,9 +1,9 @@
-from models.datamanagement import DataBaseMangament
+from models.db_operations import Models
 from auth.login_authentication import response
 
-class Note:
+class NoteServices:
     def __init__(self):
-        self.data_base_object = DataBaseMangament()
+        self.data_base_object = Models()
 
     def createnote(self,data,form_keys):
         if len(form_keys):
@@ -14,9 +14,9 @@ class Note:
             res = response(message="unsuccessfull")
             return res
 
-    def update(self,data,form_keys):
+    def update(self,data,condition,form_keys):
         if len(form_keys):
-            self.data_base_object.update(data)
+            self.data_base_object.updatee(data,condition)
             res = response(success=True, message="Data Updated Successfully")
             return res
         else:

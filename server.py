@@ -10,9 +10,11 @@ import os
 from http.server import HTTPServer
 from routes import ServiceHandler
 
+host = os.getenv("SERVER_HOST_IP_ADDRESS")
+port = int(os.getenv("SERVER_HOST_PORT"))
 if __name__ == '__main__':
-    server =HTTPServer((os.getenv("SERVER_HOST_IP_ADDRESS"),int(os.getenv("SERVER_HOST_PORT"))),ServiceHandler)
-    print(f"httpd server start on {os.getenv('SERVER_HOST_IP_ADDRESS')}:{int(os.getenv('SERVER_HOST_PORT'))}")
+    server = HTTPServer((host, port),ServiceHandler)
+    print(f"httpd server start on {host}:{port}")
     server.serve_forever()
 
 

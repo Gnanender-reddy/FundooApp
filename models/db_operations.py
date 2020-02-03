@@ -3,21 +3,17 @@
 @Since : Dec'2019
 @Description:This code is for managing database.
 """
-from config.connection import database
+from config.mysql_connection import database
 import re
 mydbobj=database
 
 
-class DataBaseMangament:
+class Models:
     """
     This class is used to form connection with the database and perform operation update, add and check
     entry into the database
     """
-    def __init__(self):
-        """
-        This function is used to form a connection with database
-        """
-        pass
+
 
     def user_insert(self, data, table_name=None):
         table_name = table_name

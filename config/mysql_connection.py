@@ -14,7 +14,6 @@ load_dotenv()
 class Database:
     """
     This class is majorly used for connecting database.
-
     """
     def __init__(self,**kwargs):
         self.connection=self.connect(**kwargs)
@@ -23,8 +22,6 @@ class Database:
     def connect(self,**kwargs):
         """
         Database connection is done here.
-        :param kwargs:
-        :return:
         """
         mydb = mysql.connector.connect(
                 host=kwargs["host"],

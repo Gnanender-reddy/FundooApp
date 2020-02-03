@@ -5,14 +5,11 @@
 """
 import cgi
 import jwt
-from services.users import User
-
+from services.users_services import UserServices
 import cgitb;
-
 cgitb.enable()
+
 class UserDetails:
-
-
 
     def for_registration(self):
         form = cgi.FieldStorage(
@@ -20,9 +17,8 @@ class UserDetails:
         headers=self.headers,
         environ={'REQUEST_METHOD':'POST','CONTENT_TYPE':self.headers['Content-Type'],}
         )
-
         data={'email':form['email'].value,'password':form['password'].value,'confirmpassword':form['confirmpassword'].value}
-        user = User()
+        user = UserServices()
         response_data = user.register(data)
         return response_data
 
@@ -37,7 +33,7 @@ class UserDetails:
                      'CONTENT_TYPE': self.headers['Content-Type'],
                      })
         data={'email':form['email'].value,'password':form['password'].value}
-        user = User()
+        user = UserServices()
         response_data = user.login(data)
         return response_data
 
@@ -54,10 +50,9 @@ class UserDetails:
         host = self.headers['Host']
 
         data={'email':form['email'].value}
-        response_data = self.user.forgot(data,host,version)
+        user = UserServices()
+        response_data = user.forgot(data,host,version)
         return response_data
-
-
 
 
     def  set_password(self,email_id):
@@ -73,14 +68,11 @@ class UserDetails:
 
         form_keys = list(form.keys())
         data = {'password': form['password'].value}
-        user=User()
-
-        response_data =user.resett(data,form_keys,email_id)
+        user=UserServices()
+        response_data =user.reset_password(data,form_keys,email_id)
         return response_data
 
-
-
-    def create_picture(self):
+    def for_profile(self):
         ctype, pdict = cgi.parse_header(self.headers.get('content-type'))
         pdict['boundary'] = bytes(pdict['boundary'], "utf-8")
         if ctype == 'multipart/form-data':
@@ -99,13 +91,6 @@ class UserDetails:
                 'profile_path': f'./media/{filename}',
                 'user_id': user_id
                     }
-            user=User()
+            user=UserServices()
             response_data = user.profile_picture(profile_data)
             return response_data
-
-
-
-
-
-
-

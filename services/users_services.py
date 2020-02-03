@@ -1,7 +1,7 @@
 import jwt
 from config.redis_connection import RedisService
-from models.datamanagement import DataBaseMangament
-from vendor.smtp import smtp
+from models.db_operations import Models
+from vendor.smtp_connection import smtp
 from view.utils import Utility
 from datetime import datetime, timedelta
 from auth.login_authentication import response
@@ -10,9 +10,9 @@ JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 100000000
 
 
-class User:
+class UserServices:
     def __init__(self):
-        self.data_base_object = DataBaseMangament()
+        self.data_base_object = Models()
         self.util=Utility()
 
     def register(self,data):
@@ -68,7 +68,7 @@ class User:
             res = response(message="unsuccessfull")
             return res
 
-    def resett(self,form_keys,data,email_id):
+    def reset_password(self,form_keys,data,email_id):
 
         if len(form_keys) < 2:
             res = response(message="some values are missing")
